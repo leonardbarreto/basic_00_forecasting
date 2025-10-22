@@ -65,7 +65,7 @@ A short description of the project.
 
 # Pipeline de Treinamento de Modelos com MLflow
 
-Projeto básico de Rede Neural Artificial (RNA) desenvolvido em **PyTorch** para fins de aprendizado e experimentação com pipelines de *deep learning*.  
+Projeto básico de _Forecasting_ utilizando o Arima e Prophet para fins de aprendizado e experimentação com pipelines para problemas de séries temporais.  
 O objetivo é construir, treinar e avaliar uma rede simples utilizando dados sintéticos com suporte a *logging* e *monitoramento* estruturado, utilizando  `Optuna` e `MLflow`.
 
 
