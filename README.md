@@ -78,27 +78,42 @@ O pipeline está estruturado para ser executado via terminal, usando Typer, com 
 python pipeline.py [OPTIONS]
 ```
 
-## Opções principais
-| Parâmetro        | Tipo | Padrão       | Descrição                                              |
-| ---------------- | ---- | ------------ | ------------------------------------------------------ |
-| `--dataset-name` | str  | "iris"       | Nome do dataset CSV processado em `PROCESSED_DATA_DIR` |
-| `--model-type`   | str  | "kmeans"     | Tipo de modelo: `"kmeans"` ou `"dbscan"`               |
-| `--task`         | str  | "clustering" | Tarefa do pipeline (atualmente apenas `"clustering"`)  |
-| `--n-trials`     | int  | 20           | Número de trials na otimização de hiperparâmetros      |
+## ⚙️ Opções principais
+
+| Parâmetro        | Tipo | Padrão          | Descrição                                                                 |
+| ---------------- | ---- | --------------- | ------------------------------------------------------------------------- |
+| `--dataset-name` | str  | "air_passengers"| Nome do dataset disponível em `dataset.py` ou no diretório `data/`       |
+| `--model-type`   | str  | "Prophet"       | Tipo de modelo a ser treinado: `"Prophet"` ou `"Arima"`                   |
+| `--optimize-params` | bool | False         | Se `True`, executa otimização de hiperparâmetros com Optuna              |
+| `--n-trials`     | int  | 20              | Número de iterações da otimização (usado quando `--optimize-params=True`) |
+| `--task`         | str  | "forecasting"   | Tipo de tarefa do pipeline (atualmente `"forecasting"`)                  |
+
+> ⚠️ **Importante:** use **kebab-case** no terminal (`--dataset-name`) e **não** `snake_case` (`--dataset_name`).
+
+---
+
+## 🚀 Exemplos de execução
+
+| Dataset         | Modelo     | Comando                                                                                     |
+| ---------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| Air Passengers   | Prophet    | `python -m forecasting_workflow_engine.modeling.train --dataset-name air_passengers --model-type Prophet` |
+| Air Passengers   | AutoARIMA  | `python -m forecasting_workflow_engine.modeling.train --dataset-name air_passengers --model-type Arima` |
+| Air Passengers   | Prophet (otimizado) | `python -m forecasting_workflow_engine.modeling.train --dataset-name air_passengers --model-type Prophet --optimize-params True --n-trials 20` |
+| Air Passengers   | AutoARIMA (via pipeline) | `python -m forecasting_workflow_engine.pipelines.pipeline --dataset-name air_passengers --model-type Arima` |
+
+---
+
+## 💡 Dica
+Se preferir rodar todos os experimentos em sequência e registrar automaticamente no MLflow:
+
+```bash
+python -m forecasting_workflow_engine.pipelines.pipeline --dataset-name air_passengers --model-type Prophet
 
 > ⚠️ Importante: Use kebab-case no terminal (--dataset-name) e não snake_case (--dataset_name).
 
-## Exemplos de execução
-| Dataset | Algoritmo | Comando                                                                   |
-| ------- | --------- | ------------------------------------------------------------------------- |
-| Iris    | KMeans    | `python pipeline.py --dataset-name iris --model-type kmeans` |
-| Iris    | DBSCAN    | `python pipeline.py --dataset-name iris --model-type dbscan` |
-| Wine    | KMeans    | `python pipeline.py --dataset-name wine --model-type kmeans` |
-| Wine    | DBSCAN    | `python pipeline.py --dataset-name wine --model-type dbscan` |
-
 ## Referências
 
-### Técnicas de Clustering
+### Técnicas de Forecasting
 1. Witten, I. H., Frank, E., Hall, M. A., & Pal, C. J. (2016). *Data Mining: Practical Machine Learning Tools and Techniques* (4th Edition). Morgan Kaufmann.  
 2. Han, J., Kamber, M., & Pei, J. (2011). *Data Mining: Concepts and Techniques* (3rd Edition). Morgan Kaufmann.  
 3. Russell, S., & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach* (4th Edition). Pearson.  
