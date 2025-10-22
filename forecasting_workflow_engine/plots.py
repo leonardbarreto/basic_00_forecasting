@@ -46,41 +46,56 @@ def plot_trend(y_series, window=12):
     plt.show()
 
 
-def plot_periodogram(y_series, sampling_rate=1.0, title="Periodograma da Série Temporal"):
+# %%
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import signal
+from loguru import logger
+
+def plot_periodogram(y_series, sampling_rate=1.0, title="Periodograma da Série Temporal", verbose=True):
     """
-    Plota o periodograma (densidade espectral de potência) de uma série temporal.
+    Plota e analisa o periodograma (densidade espectral de potência) de uma série temporal.
 
     Parâmetros
     ----------
     y_series : pd.Series ou np.ndarray
         Série temporal univariada.
     sampling_rate : float, opcional
-        Taxa de amostragem (ex: 1 para séries diárias, 24 para horárias).
+        Taxa de amostragem (ex: 1 para séries diárias, 12 para mensais, 24 para horárias).
     title : str, opcional
         Título do gráfico.
+    verbose : bool, opcional
+        Se True, imprime a interpretação dos resultados.
 
-    Referência teórica
-    ------------------
-    O periodograma é baseado na transformada discreta de Fourier (DFT) e mede
-    a potência de cada componente de frequência:
+    Retorna
+    -------
+    tuple : (freqs, power, dominant_freq, period)
+
+    Fundamentação Teórica
+    ---------------------
+    O periodograma estima a *densidade espectral de potência (PSD)*, derivada da
+    Transformada de Fourier Discreta (DFT):
+
         P(f) = |FFT(y)|² / N
-    Ele é útil para identificar sazonalidades dominantes na série.
+
+    Ele permite identificar ciclos dominantes na série:
+    - **Picos bem definidos** → indicam sazonalidade forte.
+    - **Distribuição uniforme** → indica ruído branco ou série não periódica.
+    - **Baixa frequência dominante** → tendência ou ciclo de longo prazo.
     """
     if hasattr(y_series, "values"):
         y_series = y_series.values
 
-    # Remover NaNs
+    y_series = np.asarray(y_series, dtype=float)
     y_series = y_series[~np.isnan(y_series)]
 
-    # Calcula o periodograma
+    # --- Calcula o periodograma ---
     freqs, power = signal.periodogram(y_series, fs=sampling_rate)
+    freqs, power = freqs[1:], power[1:]  # remove frequência zero
 
-    # Filtra frequências nulas
-    freqs, power = freqs[1:], power[1:]
-
-    # Plot
+    # --- Plot ---
     plt.figure(figsize=(10, 5))
-    plt.plot(freqs, power, color="steelblue")
+    plt.plot(freqs, power, color="royalblue", lw=1.5)
     plt.title(title)
     plt.xlabel("Frequência [ciclos/unidade de tempo]")
     plt.ylabel("Densidade Espectral de Potência")
@@ -88,10 +103,34 @@ def plot_periodogram(y_series, sampling_rate=1.0, title="Periodograma da Série 
     plt.tight_layout()
     plt.show()
 
-    # Identifica e loga frequência dominante
-    dominant_freq = freqs[np.argmax(power)]
-    period = 1 / dominant_freq if dominant_freq != 0 else np.nan
-    logger.info(
-        f"Frequência dominante: {dominant_freq:.4f} ({period:.2f} períodos por ciclo)")
+    # --- Interpretação automática ---
+    dominant_idx = np.argmax(power)
+    dominant_freq = freqs[dominant_idx]
+    period = 1 / dominant_freq if dominant_freq > 0 else np.nan
+    energy_ratio = power[dominant_idx] / np.sum(power)
+
+    if verbose:
+        logger.info(f"📈 Frequência dominante: {dominant_freq:.4f}")
+        logger.info(f"📆 Período estimado: {period:.2f} unidades de tempo por ciclo")
+        logger.info(f"⚡ Contribuição energética do pico: {energy_ratio*100:.2f}% da energia total")
+
+        # --- Interpretação qualitativa ---
+        if energy_ratio > 0.4:
+            interpretation = (
+                f"O gráfico mostra um pico dominante em frequência {dominant_freq:.3f}, "
+                f"indicando uma **sazonalidade forte** com período aproximado de {period:.2f} unidades de tempo."
+            )
+        elif 0.1 < energy_ratio <= 0.4:
+            interpretation = (
+                f"O espectro apresenta um pico moderado em {dominant_freq:.3f}, "
+                f"sugerindo uma **sazonalidade leve ou ciclo parcial** de {period:.2f} unidades."
+            )
+        else:
+            interpretation = (
+                "O espectro não apresenta picos marcantes, indicando uma série **dominada por ruído branco** "
+                "ou sem periodicidade clara."
+            )
+        logger.info(f"🧭 Interpretação automática: {interpretation}")
 
     return freqs, power, dominant_freq, period
+
