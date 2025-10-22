@@ -108,7 +108,7 @@ Se preferir rodar todos os experimentos em sequência e registrar automaticament
 
 ```bash
 python -m forecasting_workflow_engine.pipelines.pipeline --dataset-name air_passengers --model-type Prophet
-
+```
 > ⚠️ Importante: Use kebab-case no terminal (--dataset-name) e não snake_case (--dataset_name).
 
 ## 📚 Referências
