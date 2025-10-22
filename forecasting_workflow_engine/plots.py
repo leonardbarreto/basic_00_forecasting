@@ -1,24 +1,24 @@
+# plots.py
 import matplotlib.pyplot as plt
-from loguru import logger
 
-def plot_training_validation(train_losses, val_losses, fold: int):
+def plot_forecast(df, y_true, y_pred, title="Forecast Plot"):
     """
-    Gera gráfico de perdas de treino e validação por fold.
+    Gera um gráfico de previsão vs real e retorna a figura.
     
     Args:
-        train_losses (list[float]): lista de losses de treino por batch
-        val_losses (list[float]): lista de losses de validação por batch
-        fold (int): número do fold
+        df: DataFrame com coluna 'ds'.
+        y_true: Série real.
+        y_pred: Série prevista.
+        title: Título do gráfico.
     Returns:
-        fig (matplotlib.figure.Figure): figura gerada
+        fig: Objeto matplotlib.figure.Figure
     """
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.plot(train_losses, label='Treino', color='blue')
-    ax.plot(val_losses, label='Validação', color='orange')
-    ax.set_title(f'Fold {fold} - Treino vs Validação')
-    ax.set_xlabel('Batch')
-    ax.set_ylabel('Loss')
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(df["ds"], y_true, label="Real")
+    ax.plot(df["ds"], y_pred, label="Predito")
+    ax.set_title(title)
+    ax.set_xlabel("ds")
+    ax.set_ylabel("y")
     ax.legend()
-    ax.grid(True)
-    logger.info(f"Gráfico de Treino/Validação gerado para fold {fold}")
+    fig.tight_layout()
     return fig

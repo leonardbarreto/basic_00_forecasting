@@ -1,4 +1,4 @@
-# rna_workflow_engine/utils.py
+# forecasting_workflow_engine/utils.py
 import torch
 
 def get_device(verbose: bool = True):

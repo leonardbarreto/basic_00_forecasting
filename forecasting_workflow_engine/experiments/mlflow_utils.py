@@ -1,78 +1,66 @@
-import io
-import os
-import tempfile
-
 import mlflow
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
 from loguru import logger
-from matplotlib.figure import Figure
 
-# def start_experiment(experiment_name: str):
-#     """Inicia ou retorna um experimento MLflow"""
-#     mlflow.set_experiment(experiment_name)
-#     logger.info(f"Experimento MLflow iniciado: {experiment_name}")
-
-
+# -------------------------------
+# Experimento MLflow seguro
+# -------------------------------
 def start_experiment(experiment_name: str, run_name: str = None):
     """
-    Inicia (ou recupera) um experimento no MLflow e abre um run ativo.
+    Inicia um experimento MLflow de forma segura:
+    - Cria ou seleciona experimento.
+    - Não inicia novo run se já houver run ativo.
     """
+    # Cria ou seleciona experimento
     mlflow.set_experiment(experiment_name)
-    # Fecha run ativo se existir
-    if mlflow.active_run() is not None:
-        mlflow.end_run()
 
-    active_run = mlflow.start_run(run_name=run_name)
-    logger.info(
-        f"Experimento MLflow iniciado: {experiment_name} | Run: {run_name or active_run.info.run_id}")
-    return active_run
+    # Checa run ativo
+    active_run = mlflow.active_run()
+    if active_run:
+        logger.warning(f"Run ativo existente: {active_run.info.run_id}. Usando este run.")
+        return active_run
+    else:
+        run = mlflow.start_run(run_name=run_name)
+        logger.info(f"Novo run iniciado: {run.info.run_id} | Experimento: {experiment_name}")
+        return run
 
-
-def log_params(params: dict):
-    """Loga parâmetros no MLflow"""
-    for key, value in params.items():
-        mlflow.log_param(key, value)
-    logger.info(f"Parâmetros logados: {params}")
-
-
+# -------------------------------
+# Logging de métricas
+# -------------------------------
 def log_metrics(metrics: dict):
-    """Loga métricas no MLflow"""
-    for key, value in metrics.items():
-        if value is not None:
-            mlflow.log_metric(key, value)
-    logger.info(f"Métricas logadas: {metrics}")
+    for k, v in metrics.items():
+        mlflow.log_metric(k, v)
 
+# -------------------------------
+# Logging de dicionários
+# -------------------------------
+def log_dict(d: dict, prefix: str = "params"):
+    for k, v in d.items():
+        mlflow.log_param(f"{prefix}_{k}", v)
 
-def log_model(model):
-    """Loga o modelo no MLflow"""
-    try:
-        mlflow.pytorch.log_model(model, artifact_path="model")
-        logger.info("Modelo logado com sucesso")
-    except Exception as e:
-        logger.warning(f"Falha ao logar modelo: {e}")
+# -------------------------------
+# Logging de DataFrames (como CSV)
+# -------------------------------
+def log_dataframe(df: pd.DataFrame, artifact_name: str):
+    temp_file = Path(artifact_name)
+    df.to_csv(temp_file, index=False)
+    mlflow.log_artifact(str(temp_file))
+    temp_file.unlink()  # remove arquivo temporário
 
+# -------------------------------
+# Logging de figuras
+# -------------------------------
+def log_figure(fig: plt.Figure, artifact_name: str):
+    temp_file = Path(artifact_name)
+    fig.savefig(temp_file, bbox_inches="tight")
+    mlflow.log_artifact(str(temp_file))
+    plt.close(fig)
+    temp_file.unlink()
 
-def get_active_run_id():
-    """
-    Retorna o run_id do run MLflow ativo.
-    """
-    run = mlflow.active_run()
-    if run is not None:
-        return run.info.run_id
-    return None
-
-
-def log_figure(fig: Figure, artifact_name: str):
-    """
-    Loga uma figura do Matplotlib no MLflow como artefato.
-    Salva temporariamente no disco antes do upload.
-    """
-    # Cria arquivo temporário
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
-        tmp_path = tmpfile.name
-        fig.savefig(tmp_path, format='png', bbox_inches='tight')
-
-    # Loga no MLflow
-    mlflow.log_artifact(tmp_path, artifact_path=os.path.dirname(artifact_name))
-
-    # Remove arquivo temporário
-    os.remove(tmp_path)
+# -------------------------------
+# Logging de arquivo de modelo
+# -------------------------------
+def log_model_file(local_path: str, artifact_name: str):
+    mlflow.log_artifact(local_path, artifact_path=artifact_name)
