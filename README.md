@@ -110,6 +110,7 @@ Se preferir rodar todos os experimentos em sequência e registrar automaticament
 python -m forecasting_workflow_engine.pipelines.pipeline --dataset-name air_passengers --model-type Prophet
 ```
 > ⚠️ Importante: Use kebab-case no terminal (--dataset-name) e não snake_case (--dataset_name).
+
 ## 💡 Dica 2
 Execute o notebook para acessar análises iniciais
 
