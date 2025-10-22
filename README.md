@@ -111,13 +111,18 @@ python -m forecasting_workflow_engine.pipelines.pipeline --dataset-name air_pass
 
 > ⚠️ Importante: Use kebab-case no terminal (--dataset-name) e não snake_case (--dataset_name).
 
-## Referências
+## 📚 Referências
+### Séries temporais, Prophet, Arima
 
-### Técnicas de Forecasting
-1. Witten, I. H., Frank, E., Hall, M. A., & Pal, C. J. (2016). *Data Mining: Practical Machine Learning Tools and Techniques* (4th Edition). Morgan Kaufmann.  
-2. Han, J., Kamber, M., & Pei, J. (2011). *Data Mining: Concepts and Techniques* (3rd Edition). Morgan Kaufmann.  
-3. Russell, S., & Norvig, P. (2021). *Artificial Intelligence: A Modern Approach* (4th Edition). Pearson.  
-4. Géron, A. (2022). *Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow* (3rd Edition). O’Reilly Media.
+1. **Taylor, S. J.; Letham, B.** Forecasting at scale. *The American Statistician*, v. 72, n. 1, p. 37–45, 2018.
+2. **Hyndman, R. J.; Athanasopoulos, G.** Forecasting: Principles and Practice. 3. ed. Melbourne: OTexts, 2021. Disponível em: [https://otexts.com/fpp3/](https://otexts.com/fpp3/).
+3. **Box, G. E. P.; Jenkins, G. M.; Reinsel, G. C.; Ljung, G. M.** Time Series Analysis: Forecasting and Control. 5. ed. Hoboken: John Wiley & Sons, 2015.
+4. **Meta (Facebook Research).** Prophet: Forecasting at Scale — Official Documentation. 2025. Disponível em: [https://facebook.github.io/prophet/](https://facebook.github.io/prophet/).
+5. **Pellegrini, T.; Baeza-Yates, R.; Barbosa, L.** AutoARIMA: Model Selection and Hyperparameter Optimization for ARIMA. *pmdarima Documentation*, 2025. Disponível em: [https://alkaline-ml.com/pmdarima/](https://alkaline-ml.com/pmdarima/).
+6. **Shumway, R. H.; Stoffer, D. S.** Time Series Analysis and Its Applications: With R Examples. 4. ed. Springer, 2017.
+7. **Chatfield, C.** The Analysis of Time Series: An Introduction. 6. ed. Chapman and Hall/CRC, 2003.
+8. **Zhang, G.** Time series forecasting using a hybrid ARIMA and neural network model. *Neurocomputing*, v. 50, p. 159–175, 2003.
+
 
 ### Otimização de Hiperparâmetros (Optuna)
 5. Akiba, T., Sano, S., Yanase, T., Ohta, T., & Koyama, M. (2019). *Optuna: A Next-generation Hyperparameter Optimization Framework*. Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD’19).  
